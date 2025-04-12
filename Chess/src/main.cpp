@@ -1,5 +1,4 @@
 #include "Chess.h"
-#include "Game.h"
 #include <sstream>
 
 int main()
