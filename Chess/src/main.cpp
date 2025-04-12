@@ -5,7 +5,6 @@ int main()
 {
     std::string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     Chess a(board);
-    Game game(board);
 
     int codeResponse = 0;
     std::string res = a.getInput();
@@ -15,7 +14,7 @@ int main()
         std::stringstream ss(res);
         ss >> from >> to;
 
-        codeResponse = game.tryMove(from, to);
+        // Here, simply call the relevant Chess method directly
         a.setCodeResponse(codeResponse);
         res = a.getInput();
     }
