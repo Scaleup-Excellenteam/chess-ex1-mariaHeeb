@@ -1,9 +1,9 @@
 #pragma once
 #include "MyPiece.h"
 
-class BishopPiece : public MyPiece {
+class MyBishop : public MyPiece {
 public:
-    BishopPiece(bool white, int r, int c) : MyPiece(white, r, c) {}
+    MyBishop(bool white, int r, int c) : MyPiece(white, r, c) {}
     
     char symbol() const override { 
         return isWhite ? 'B' : 'b'; 
