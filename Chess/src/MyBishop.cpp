@@ -1,7 +1,7 @@
-#include "BishopPiece.h"
+#include "MyBishop.h"
 #include <cstdlib>
 
-bool BishopPiece::checkMove(int r, int c, Piece* b[8][8]) {
+bool MyBishop::checkMove(int r, int c, MyPiece* b[8][8]) {
     int sr = getRow();
     int sc = getCol();
 
