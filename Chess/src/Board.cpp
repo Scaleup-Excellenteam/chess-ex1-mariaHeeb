@@ -2,68 +2,67 @@
 #include <cctype>
 #include <memory>
 
-Board::Board() {
+MyBoard::MyBoard() {
     for (int i = 0; i < 8; ++i)
         for (int j = 0; j < 8; ++j)
-            boardMove[i][j] = nullptr;
+            boardArr[i][j] = nullptr;
 }
 
-Board::~Board() {}
+MyBoard::~MyBoard() {}
 
-void Board::loadFromString(const std::string& boardString) {
-    if (boardString.size() != 64)
+void MyBoard::loadFromString(const std::string& stateStr) {
+    if (stateStr.size() != 64)
         return;
 
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            int index = i * 8 + j;
-            char symbol = boardString[index];
+            int idx = i * 8 + j;
+            char sym = stateStr[idx];
 
-            boardMove[i][j] = nullptr;
+            boardArr[i][j] = nullptr;
 
-            char lower = std::tolower(symbol);
-            bool isWhite = std::isupper(symbol);
+            char small = std::tolower(sym);
+            bool white = std::isupper(sym);
 
-            switch (lower) {
+            switch (small) {
                 case 'r':
-                    boardMove[i][j] = std::make_unique<Rook>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyRook>(white, i, j);
                     break;
                 case 'k':
-                    boardMove[i][j] = std::make_unique<King>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyKing>(white, i, j);
                     break;
                 case 'b':
-                    boardMove[i][j] = std::make_unique<Bishop>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyBishop>(white, i, j);
                     break;
                 case 'q':
-                    boardMove[i][j] = std::make_unique<Queen>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyQueen>(white, i, j);
                     break;
                 case 'n':
-                    boardMove[i][j] = std::make_unique<Knight>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyKnight>(white, i, j);
                     break;
                 case 'p':
-                    boardMove[i][j] = std::make_unique<Pawn>(isWhite, i, j);
+                    boardArr[i][j] = std::make_unique<MyPawn>(white, i, j);
                     break;
-                case '#':
                 default:
-                    boardMove[i][j] = nullptr;
+                    boardArr[i][j] = nullptr;
                     break;
             }
         }
     }
 }
 
-std::string Board::getBoardString() const {
-    std::string result;
+std::string MyBoard::getBoardString() const {
+    std::string res;
     for (int i = 0; i < 8; ++i)
         for (int j = 0; j < 8; ++j)
-            result += (boardMove[i][j] ? boardMove[i][j]->getPiece() : '#');
-    return result;
+            res += (boardArr[i][j] ? boardArr[i][j]->symbol() : '#');
+    return res;
 }
 
-Piece* const* const* Board::getRawBoard() const {
-    static Piece* raw[8][8];
+MyPiece* const* const* MyBoard::getRawBoard() const {
+    static MyPiece* raw[8][8];
     for (int i = 0; i < 8; ++i)
         for (int j = 0; j < 8; ++j)
-            raw[i][j] = boardMove[i][j].get();
-    return (Piece* const* const*)raw;
+            raw[i][j] = boardArr[i][j].get();
+    return (MyPiece* const* const*)raw;
 }
