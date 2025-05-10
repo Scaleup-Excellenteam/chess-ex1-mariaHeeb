@@ -1,7 +1,14 @@
 #include "Board.h"
 #include <cctype>
 #include <memory>
-
+#include "MyRook.h"
+#include "MyKing.h"
+#include "MyQueen.h"
+#include "MyBishop.h"
+#include "MyKnight.h"
+#include "MyPawn.h"
+#include <cctype>
+#include <memory>
 MyBoard::MyBoard() {
     for (int i = 0; i < 8; ++i)
         for (int j = 0; j < 8; ++j)
