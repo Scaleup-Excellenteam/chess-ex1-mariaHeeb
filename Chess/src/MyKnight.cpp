@@ -1,4 +1,4 @@
-#include "Knight.h"
+#include "MyKnight.h"
 #include <cmath>
 
 bool MyKnight::checkMove(int toRow, int toCol, MyPiece* /*notUsed*/[8][8]) {
