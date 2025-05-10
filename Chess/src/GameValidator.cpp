@@ -3,7 +3,7 @@
 #include "MyPiece.h"
 #include "MyKnight.h"
 
-int checkMove(const std::string& m, std::string& state, bool isWhiteTurn) {
+int validateMove(const std::string& m, std::string& state, bool isWhiteTurn) {
     int sCol = m[0] - 'a';
     int sRow = m[1] - '1';
     int dCol = m[2] - 'a';
