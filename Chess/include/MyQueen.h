@@ -1,10 +1,14 @@
 #pragma once
-#include "Piece.h"
+#include "MyPiece.h"
 
-class Queen : public Piece {
+class MyQueen : public MyPiece {
 public:
-    Queen(bool isWhite, int row, int col) : Piece(isWhite, row, col) {}
-    char getPiece() const override { return isWhite ? 'Q' : 'q'; }
-    bool isLegalMove(int destRow, int destCol, Piece* board[8][8]) override;
-    bool areSquaresLegal(int srcRow, int srcCol, int destRow, int destCol, Piece* board[8][8]);
+    MyQueen(bool white, int r, int c) : MyPiece(white, r, c) {}
+
+    char symbol() const override { 
+        return isWhite ? 'Q' : 'q'; 
+    }
+
+    bool checkMove(int toRow, int toCol, MyPiece* b[8][8]) override;
+    bool checkSquares(int fromRow, int fromCol, int toRow, int toCol, MyPiece* b[8][8]);
 };
