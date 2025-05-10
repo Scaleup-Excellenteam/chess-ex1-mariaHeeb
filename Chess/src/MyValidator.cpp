@@ -1,5 +1,5 @@
 #include "MyValidator.h"
-#include "MyBoard.h"
+#include "Board.h"
 #include "MyPiece.h"
 #include "MyKnight.h"
 
