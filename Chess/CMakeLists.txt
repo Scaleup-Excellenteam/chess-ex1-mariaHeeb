@@ -1,22 +1,18 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
+project(ChessGame)
 
-project(Chess)
+# Set C++ version
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if (MSVC AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
-    set(CMAKE_CXX_STANDARD 23)
-else()
-    set(CMAKE_CXX_STANDARD 20)
-endif()
-
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-if (MSVC)
-    add_compile_options(/W4 /permissive- /Zc:externConstexpr /Zc:inline)
-endif()
-
+# Include directories for headers
 include_directories(include)
 
-file(GLOB SOURCES src/*.cpp)
+# Collect all .cpp files in src/
+file(GLOB SOURCES "src/*.cpp")
 
+# Create the executable
 add_executable(Chess ${SOURCES})
+
+# Optional: show all warnings
+target_compile_options(Chess PRIVATE -Wall -Wextra -pedantic)
