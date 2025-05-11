@@ -1,75 +1,94 @@
 #include "Board.h"
-#include <cctype>
-#include <memory>
-#include "MyRook.h"
-#include "MyKing.h"
-#include "MyQueen.h"
-#include "MyBishop.h"
-#include "MyKnight.h"
-#include "MyPawn.h"
-#include <cctype>
-#include <memory>
-MyBoard::MyBoard() {
-    for (int i = 0; i < 8; ++i)
-        for (int j = 0; j < 8; ++j)
-            boardArr[i][j] = nullptr;
-}
+#include "PriorityQueue.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
 
-MyBoard::~MyBoard() {}
+// Define Move struct for suggestion
+struct Move {
+    int fromRow, fromCol, toRow, toCol;
+    int score;
 
-void MyBoard::loadFromString(const std::string& stateStr) {
-    if (stateStr.size() != 64)
-        return;
+    Move(int fr, int fc, int tr, int tc, int s)
+        : fromRow(fr), fromCol(fc), toRow(tr), toCol(tc), score(s) {}
+};
 
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            int idx = i * 8 + j;
-            char sym = stateStr[idx];
+// Comparator for Move based on score
+struct MoveComparator {
+    int operator()(const Move& a, const Move& b) const {
+        return a.score - b.score;
+    }
+};
 
-            boardArr[i][j] = nullptr;
+// Suggest best move(s)
+void MyBoard::suggestBestMove(bool isWhiteTurn) const {
+    PriorityQueue<Move, MoveComparator> pq;
 
-            char small = std::tolower(sym);
-            bool white = std::isupper(sym);
+    for (int fr = 0; fr < 8; ++fr) {
+        for (int fc = 0; fc < 8; ++fc) {
+            MyPiece* piece = boardArr[fr][fc].get();
+            if (!piece || piece->getColor() != isWhiteTurn) continue;
 
-            switch (small) {
-                case 'r':
-                    boardArr[i][j] = std::make_unique<MyRook>(white, i, j);
-                    break;
-                case 'k':
-                    boardArr[i][j] = std::make_unique<MyKing>(white, i, j);
-                    break;
-                case 'b':
-                    boardArr[i][j] = std::make_unique<MyBishop>(white, i, j);
-                    break;
-                case 'q':
-                    boardArr[i][j] = std::make_unique<MyQueen>(white, i, j);
-                    break;
-                case 'n':
-                    boardArr[i][j] = std::make_unique<MyKnight>(white, i, j);
-                    break;
-                case 'p':
-                    boardArr[i][j] = std::make_unique<MyPawn>(white, i, j);
-                    break;
-                default:
-                    boardArr[i][j] = nullptr;
-                    break;
+            for (int tr = 0; tr < 8; ++tr) {
+                for (int tc = 0; tc < 8; ++tc) {
+                    MyPiece* target = boardArr[tr][tc].get();
+                    if (target && target->getColor() == isWhiteTurn) continue;
+
+                    if (piece->checkMove(tr, tc, getRawBoard())) {
+                        int baseScore = target ? 10 : 1;
+
+                        // Bonus 1: Center Control
+                        if ((tr == 3 || tr == 4) && (tc == 3 || tc == 4)) {
+                            baseScore += 3;
+                        }
+
+                        // Bonus 2: Threat Count After Move
+                        int threatCount = 0;
+                        MyPiece* savedPiece = boardArr[tr][tc].release();
+                        boardArr[tr][tc].reset(boardArr[fr][fc].release());
+                        boardArr[fr][fc].reset();
+
+                        MyPiece* movedPiece = boardArr[tr][tc].get();
+                        for (int nr = 0; nr < 8; ++nr) {
+                            for (int nc = 0; nc < 8; ++nc) {
+                                MyPiece* enemy = boardArr[nr][nc].get();
+                                if (enemy && enemy->getColor() != isWhiteTurn &&
+                                    movedPiece->checkMove(nr, nc, getRawBoard())) {
+                                    threatCount++;
+                                }
+                            }
+                        }
+                        baseScore += threatCount * 2;
+
+                        // Bonus 3: Pawn Promotion
+                        if (movedPiece && dynamic_cast<MyPawn*>(movedPiece) && (tr == 0 || tr == 7)) {
+                            baseScore += 5;
+                        }
+
+                        // Restore Board State
+                        boardArr[fr][fc].reset(boardArr[tr][tc].release());
+                        boardArr[tr][tc].reset(savedPiece);
+
+                        // Push move with calculated score
+                        pq.push(Move(fr, fc, tr, tc, baseScore));
+                    }
+                }
             }
         }
     }
-}
 
-std::string MyBoard::getBoardString() const {
-    std::string res;
-    for (int i = 0; i < 8; ++i)
-        for (int j = 0; j < 8; ++j)
-            res += (boardArr[i][j] ? boardArr[i][j]->symbol() : '#');
-    return res;
-}
+    if (pq.isEmpty()) {
+        std::cout << "No legal moves found." << std::endl;
+        return;
+    }
 
-MyPiece* const* const* MyBoard::getRawBoard() const {
-    static MyPiece* raw[8][8];
-    for (int i = 0; i < 8; ++i)
-        for (int j = 0; j < 8; ++j)
-            raw[i][j] = boardArr[i][j].get();
-    return (MyPiece* const* const*)raw;
+    std::cout << "Top suggested moves:" << std::endl;
+    int count = 0;
+    while (!pq.isEmpty() && count < 3) {
+        Move best = pq.poll();
+        std::cout << "From (" << best.fromRow << "," << best.fromCol << ") to ("
+                  << best.toRow << "," << best.toCol << ") with score " << best.score << std::endl;
+        ++count;
+    }
 }
