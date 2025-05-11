@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 #include <string>
 #include "MyPiece.h"
@@ -17,10 +16,12 @@ public:
 
     void loadFromString(const std::string& stateStr);
     std::string getBoardString() const;
-
     MyPiece* const* const* getRawBoard() const;
 
     std::unique_ptr<MyPiece> boardArr[8][8];
+
+    // New method to suggest best move
+    void suggestBestMove(bool isWhiteTurn) const;
 
     MyBoard(const MyBoard&) = delete;
     MyBoard& operator=(const MyBoard&) = delete;
