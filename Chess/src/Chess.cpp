@@ -1,11 +1,43 @@
 #include "Chess.h"
 #include <iostream>
 #include <string>
-
+#include "threadpool.h"
+#include <algorithm>
 using namespace std;
 
 #ifdef _WIN32
+void Chess::multiThreadSearch(int depth, unsigned int threads) {
+    ThreadPool pool(threads);
+    auto pieces = board.getPieces(m_turn);
 
+    std::vector<Move> results;
+    std::mutex       resultsMutex;
+
+    for (size_t i = 0; i < pieces.size(); ++i) {
+        pool.submit([this, &pieces, i, depth, &results, &resultsMutex] {
+            Move best = computeBestFor(pieces[i], depth);
+            {
+                std::lock_guard<std::mutex> guard(resultsMutex);
+                results.push_back(best);
+            }
+        });
+    }
+
+    pool.shutdown();
+
+    auto it = std::max_element(
+        results.begin(), results.end(), MoveComparator()
+    );
+    if (it != results.end()) {
+        applyMove(*it);
+    }
+}
+
+void Chess::searchAndPlay(int depth, unsigned int threads) {
+    // you can loop for multiple moves, here just one
+    multiThreadSearch(depth, threads);
+    // then update turn, display, etc.
+}
 // clear the screen "cls"
 void Chess::clear() const 
 {
