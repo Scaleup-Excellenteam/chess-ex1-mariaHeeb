@@ -5,7 +5,11 @@
 #endif
 
 #include <string>
-
+#include "threadpool.h"    // our pool
+#include <vector>          // for collecting moves
+#include <mutex>           // for protecting the vector
+#include "Move.h"         // your Move type
+#include "MoveComparator.h" // comparator for Move
 using std::cout;
 using std::cin; 
 using std::endl;
@@ -33,11 +37,12 @@ class Chess {
 	bool isExit() const;
 	void excute();
 	void doTurn();
-
+void multiThreadSearch(int depth, unsigned int threads);
 public:
 	Chess(const string& start = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr");
 	Chess(const Chess&)=delete;
 	Chess& operator=(const Chess&) = delete;
 	string getInput();
 	void setCodeResponse(int codeResponse);
+void searchAndPlay(int depth, unsigned int threads);
 };
