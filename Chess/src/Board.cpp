@@ -92,3 +92,31 @@ void MyBoard::suggestBestMove(bool isWhiteTurn) const {
         ++count;
     }
 }
+
+Move MyBoard::computeBestFor(const std::string& piecePos, int depth) const {
+    int col = piecePos[0] - 'a';
+    int row = 8 - (piecePos[1] - '0');
+    int newRow = row + (isupper(m_boardStr[row * 8 + col]) ? -1 : 1);
+    if (newRow >= 0 && newRow < 8) {
+        return Move(piecePos, std::string(1, 'a' + col) + std::to_string(8 - newRow), 10);
+    }
+    return Move(piecePos, piecePos, 0); 
+}
+void MyBoard::applyMove(const Move& move) {
+    char piece = m_boardStr[move.srcRow * 8 + move.srcCol];
+    m_boardStr[move.srcRow * 8 + move.srcCol] = '#';
+    m_boardStr[move.dstRow * 8 + move.dstCol] = piece;
+}
+std::vector<std::string> MyBoard::getPieces(bool isWhiteTurn) const {
+    std::vector<std::string> positions;
+    for (int i = 0; i < 64; ++i) {
+        char piece = m_boardStr[i];
+        if ((isWhiteTurn && isupper(piece)) || (!isWhiteTurn && islower(piece))) {
+            int row = i / 8;
+            int col = i % 8;
+            positions.emplace_back(std::string(1, 'a' + col) + std::to_string(8 - row));
+        }
+    }
+    return positions;
+}
+
