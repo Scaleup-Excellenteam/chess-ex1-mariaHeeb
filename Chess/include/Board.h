@@ -25,4 +25,9 @@ public:
 
     MyBoard(const MyBoard&) = delete;
     MyBoard& operator=(const MyBoard&) = delete;
+ void display() const;
+    bool isValidMove(const Move& move, bool isWhiteTurn) const;
+    void applyMove(const Move& move);
+    std::vector<std::string> getPieces(bool isWhiteTurn) const;
+    Move computeBestFor(const std::string& piecePos, int depth) const;
 };
